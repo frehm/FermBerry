@@ -1,0 +1,31 @@
+{
+  "name": "fermberry",
+  "version": "1.0.0",
+  "description": "Fermentation temperature control",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frehm/FermBerry.git"
+  },
+  "keywords": [
+    "raspberry",
+    "onewire",
+    "beer",
+    "fermentation",
+    "pid",
+    "control"
+  ],
+  "author": "Andreas Johansson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/frehm/FermBerry/issues"
+  },
+  "homepage": "https://github.com/frehm/FermBerry#readme",
+  "dependencies": {
+    "express": "^4.13.3",
+    "morgan": "^1.6.1"
+  }
+}
