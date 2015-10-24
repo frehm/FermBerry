@@ -12,16 +12,20 @@ class Temperature extends events.EventEmitter {
     this.sensorMin = -55;
     this.sensorMax = 125;
     this.enabled = false;
-
+    this.wait = 0;
   }
 
-  _poll = function () {
+  _poll() {
     var self = this;
 
-    fs.readFile(path, 'utf8', function (err, data) {
+    fs.readFile(this.path, 'utf8', function (err, data) {
 
       if (err) {
-        self.emit('error', 'fail_read_file');
+        self.emit('error', {
+          name: self.name,
+          error: 'fail_read_file'
+        });
+        self.wait = 1000;
       } else {
 
         let crcOk = data.match(/YES/g);
@@ -29,11 +33,18 @@ class Temperature extends events.EventEmitter {
         if (crcOk) {
           let signal = data.match(/t=(\-?\d+)/i);
           let temperature = signal[1] / 1000.0;
+          self.wait = 0;
 
           if (Number.parseInt(signal[1], 10) === 85000) {
-            self.emit('error', 'sensor_power_on');
+            self.emit('error', {
+              name: self.name,
+              error: 'sensor_power_on'
+            });
           } else if (temperature < self.sensorMin || temperature > self.sensorMax) {
-            self.emit('error', 'out_of_range');
+            self.emit('error', {
+              name: self.name,
+              error: 'out_of_range'
+            });
           } else {
             self.emit('data', {
               name: self.name,
@@ -43,7 +54,11 @@ class Temperature extends events.EventEmitter {
           }
         // crc not ok
         } else {
-          self.emit('error', 'crc_not_ok');
+          self.emit('error', {
+            name: self.name,
+            error: 'crc_not_ok'
+          });
+          self.wait = 500;
         }
 
       }
@@ -51,23 +66,26 @@ class Temperature extends events.EventEmitter {
       if (self.enabled) {
         setTimeout(function () {
           self._poll();
-        }, 1);
+        }, self.wait);
       } else {
-        self.emit('end', 'disabled');
+        self.emit('end', {
+          name: self.name,
+          error: 'disabled'
+        });
       }
 
     });
 
   }
 
-  startPolling = function () {
+  startPolling() {
     this.enabled = true;
 
-    _poll();
+    this._poll();
 
   }
 
-  stopPolling = function () {
+  stopPolling() {
     this.enabled = false;
   }
 
