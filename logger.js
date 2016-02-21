@@ -7,7 +7,7 @@ class Logger {
     this.temperatures = new Map();
   }
 
-  _postToInflux = function (measurement, data, callback) {
+  _postToInflux(measurement, data, callback) {
     let options = {
       headers: {
         'Content-Type': 'text/plain'
