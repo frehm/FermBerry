@@ -13,7 +13,7 @@ class Logger {
         'Content-Type': 'text/plain'
       },
       uri: 'http://localhost:8086/write?db=beer',
-      body: `${measurement},sensor=${data.name} value=${data.temperature} ${data.time.getTime() * 1000}`,
+      body: `${measurement},sensor=${data.name} value=${data.temperature} ${data.time.getTime() * 1000000}`,
       method: 'POST'
     };
 
