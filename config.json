@@ -6,5 +6,8 @@
   "sensors": [{
     "path": "/sys/bus/w1/devices/28-0414695d25ff/w1_slave",
     "name": "ambient"
+  }, {
+    "path": "/sys/bus/w1/devices/28-000004d4dd59/w1_slave",
+    "name": "beer"
   }]
 }
