@@ -1,75 +1,93 @@
 'use strict';
 
-var express = require('express');
-var morgan = require('morgan');
-var Temperature = require('./temperature')
-var PidController = require('./pid-controller');
-var Logger = require('./logger');
+const express = require('express');
+const morgan = require('morgan');
+const Temperature = require('./temperature.js');
+const Logger = require('./logger.js');
+const config = require('./config.json');
 
-//TODO: Get initializing parameters from config/db
-var logger = new Logger(0.062);
-var pid = new PidController(19.7, 1, 300, 50);
-var beerTemperature = new Temperature('/sys/bus/w1/devices/28-0414695d25ff/w1_slave', 'beer');
+let logger = new Logger(0.001);
+let temperatures = config.sensors.map(sensor => {
+  let sensorTemp = new Temperature(sensor.path, sensor.name);
 
-//TODO: Continuously read temperature and update pid, pid.input(temperature);
-beerTemperature.on('data', function (data) {
+  sensorTemp.on('data', function (data) {
+    logger.temperature(data);
 
-  if (data.name === 'beer') {
-    pid.input(data.temperature);
-  }
+  });
 
-  logger.temperature(data);
+  sensorTemp.on('error', function (message) {
+    console.log('error', message);
+  });
 
+  return sensorTemp;
 });
 
-beerTemperature.on('error', function (message) {
-  console.log('error', message);
-});
-
-pid.on('output', function (output) {
-  console.log('output', output);
-});
-
-var app = express();
+const app = express();
 
 app.use(morgan('dev'));
 
-app.get('api/info', function (req, res) {
+/*app.get('api/info', function (req, res) {
 
   res.json({
-    success: true,
-    message: 'Not yet implemented'
+    ok: true,
+    pid: {
+      auto: pid.auto,
+      setpoint: pid.setpoint
+    },
+    temperature: {
+      beer: {
+        enabled: beerTemperature.enabled
+      }
+    }
   });
 
-});
+});*/
 
-app.post('api/start', function (req, res) {
+/*app.post('api/pid.start', function (req, res) {
 
   pid.setAuto();
 
   res.json({
-    success: true
+    ok: true
   });
 
 });
 
-app.post('api/stop', function (req, res) {
+app.post('api/pid.stop', function (req, res) {
 
   pid.setManual();
 
   res.json({
-    success: true
+    ok: true
+  });
+
+});*/
+
+app.post('api/logging.start', function (req, res) {
+
+  temperatures.forEach(t => t.startPolling());
+
+  res.json({
+    ok: true
   });
 
 });
 
+app.post('api/logging.stop', function (req, res) {
 
+  temperatures.forEach(t => t.stopPolling());
 
-var server = app.listen(3101, function () {
-  var host = server.address().address;
-  var port = server.address().port;
+  res.json({
+    ok: true
+  });
 
-  beerTemperature.startPolling();
+});
+
+const server = app.listen(3101, function () {
+  const host = server.address().address;
+  const port = server.address().port;
 
   console.log('Api started at http://%s:%s', host, port);
+
+  temperatures.forEach(t => t.startPolling());
 });

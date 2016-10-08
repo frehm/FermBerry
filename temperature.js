@@ -1,7 +1,7 @@
 'use strict';
 
-var events = require('events');
-var fs = require('fs');
+const events = require('events');
+const fs = require('fs');
 
 class Temperature extends events.EventEmitter {
   constructor(path, name) {
