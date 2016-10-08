@@ -25,15 +25,15 @@ class Logger {
   }
 
   _log(measurement, data) {
-    //console.log('log', measurement, data);
     this._postToInflux(measurement, data, err => {
       if (err) console.error('post_err', err);
     });
   }
 
   temperature(data) {
-    console.log(data);
-    var oldData = this.temperatures.get(data.name);
+    this._log('temperature', data);
+    /*
+    const oldData = this.temperatures.get(data.name);
 
     if (oldData) {
       // check if change over threshold
@@ -47,7 +47,7 @@ class Logger {
     } else {
       this.temperatures.set(data.name, data);
       this._log('temperature', data);
-    }
+    }*/
 
   }
 
