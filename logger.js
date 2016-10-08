@@ -1,5 +1,6 @@
 'use strict';
 const request = require('request');
+const config = require('./config.json');
 
 class Logger {
   constructor(temperatureThreshold) {
@@ -12,8 +13,8 @@ class Logger {
       headers: {
         'Content-Type': 'text/plain'
       },
-      uri: 'http://localhost:8086/write?db=beer',
-      body: `${measurement},sensor=${data.name} value=${data.temperature} ${data.time.getTime() * 1000000}`,
+      uri: `${config.database.host}/write?db=${config.database.db}&precision=ms`,
+      body: `${measurement},sensor=${data.name} value=${data.temperature} ${data.time.getTime()}`,
       method: 'POST'
     };
 
@@ -31,6 +32,7 @@ class Logger {
   }
 
   temperature(data) {
+    console.log(data);
     var oldData = this.temperatures.get(data.name);
 
     if (oldData) {
