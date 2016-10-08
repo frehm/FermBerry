@@ -1,0 +1,10 @@
+{
+  "database": {
+    "host": "http://192.168.0.105:8086",
+    "db": "brewing"
+  },
+  "sensors": [{
+    "path": "/sys/bus/w1/devices/28-0414695d25ff/w1_slave",
+    "name": "ambient"
+  }]
+}
